@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Bootstrap Example</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
+
+    <style>
+
+      #title {
+        display: inline-block;
+        padding: 20px;
+        border-radius: 5px;
+        margin-top: 20px;
+        color: #ddd;
+      }
+
+      body {
+        background-color: #222;
+        min-width: 250px;
+      }
+
+      .sound-btn {
+        margin: auto;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        width: 100%;
+      }
+
+      #btn-container {
+        margin-top: 30px;
+        background-color: lightgrey;
+        border-radius: 5px;
+      }
+
+      .btn {
+        outline: none !important;
+      }
+
+    </style>
+
+  </head>
+  <body>
+
+    <div class="container">
+      <div class="text-center">
+        <h1 id="title" class="text-center">Sound Effect Board</h1>
+      </div>
+      <div class="row">
+        <div class="col-md-12 text-center">
+          <input id="videoId-input" placeholder="videoID (...?v=videID)"></input>
+          <input id="name-input" placeholder="name"></input>
+          <button onclick="add(); build_grid();">Add</button>
+        </div>
+      </div>
+      <div id="btn-container" class="row">
+        <div class="col-md-12" id="players"></div>
+      </div>
+    </div>
+
+  </body>
+  <script>
+
+    var player_info = [
+      {'name':'be right back', 'videoid':'J85jV37CsYE'},
+      {'name':'goat scream', 'videoid':'X78GyIfrSV4'},
+      {'name':'bruh', 'videoid':'D2_r4q2imnQ'},
+      {'name':'FBI', 'videoid':'QQR7t712Mhg'},
+    ];
+
+
+    function add() {
+      player_info.push({
+        'name':document.getElementById('name-input').value,
+        'videoid':document.getElementById('videoId-input').value,
+      });
+    }
+
+    function build_grid() {
+      document.getElementById('players').innerHTML = "";
+      for (let i = 0; i < player_info.length; i++) {
+        const i_ = i;
+        let col = document.createElement('div');
+        document.getElementById('players').appendChild(col);
+        col.classList.add('col-sm-3');
+        const btn = document.createElement('button');
+        btn.disabled = true;
+        btn.classList.add('btn', 'btn-lg', 'sound-btn')
+        btn.innerHTML = player_info[i].name;
+        col.appendChild(btn);
+        const player_div = document.createElement('div');
+        player_div.setAttribute('id', 'player-' + i);
+        btn.appendChild(player_div);
+
+        player_info[i].togglePlayButton = function(state) {
+          btn.classList.remove('btn-default', 'btn-warning', 'btn-danger');
+          if (state == 'inactive') {
+            btn.classList.add('btn-default');
+          } else if (state == 'playing') {
+            btn.classList.add('btn-danger');
+          }
+          //  else if (state == 'paused') {
+          //   btn.classList.add('btn-warning');
+          // }
+        }
+
+        btn.onclick = function toggleAudio() {
+          if (player_info[i_].player.getPlayerState() == 1 || player_info[i_].player.getPlayerState() == 3) {
+            player_info[i_].player.stopVideo();
+            player_info[i_].togglePlayButton("inactive");
+          } else {
+            player_info[i_].player.playVideo();
+            player_info[i_].togglePlayButton("playing");
+          }
+        }
+
+        player_info[i_].player = new YT.Player('player-'+i_, {
+          height: '0',
+          width: '0',
+          videoId: player_info[i_].videoid,
+          playerVars: {
+            autoplay: "0",
+            loop: "0",
+          },
+          events: {
+            onReady: function(event) {
+              btn.disabled = false;
+              player_info[i_].player.setPlaybackQuality("small");
+              player_info[i_].togglePlayButton(player_info[i_].player.getPlayerState() === 5 ? "inactive" : "playing");
+            },
+            onStateChange: function(event) {
+              if (event.data === 0) {
+                player_info[i_].togglePlayButton("inactive");
+              }
+            }
+          }
+        });
+
+      }
+    }
+
+
+
+    function onYouTubeIframeAPIReady() {
+      build_grid();
+    }
+
+
+
+
+
+
+
+
+
+  </script>
+</html>
