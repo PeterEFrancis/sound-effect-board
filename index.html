@@ -26,10 +26,10 @@
       }
 
       .sound-btn {
-        margin: auto;
-        margin-top: 10px;
-        margin-bottom: 10px;
-        width: 100%;
+        margin: 10px;
+        width: 100px;
+        overflow-wrap: normal;
+        white-space: normal;
       }
 
       #btn-container {
@@ -53,9 +53,9 @@
       </div>
       <div class="row">
         <div class="col-md-12 text-center">
-          <input id="videoId-input" placeholder="videoID (...?v=videID)"></input>
+          <input id="videoId-input" placeholder="videoId (...?v=videoId)"></input>
           <input id="name-input" placeholder="name"></input>
-          <button onclick="add(); build_grid();">Add</button>
+          <button onclick="add();">Add</button>
         </div>
       </div>
       <div id="btn-container" class="row">
@@ -67,32 +67,39 @@
   <script>
 
     var player_info = [
-      {'name':'be right back', 'videoid':'J85jV37CsYE'},
-      {'name':'goat scream', 'videoid':'X78GyIfrSV4'},
-      {'name':'bruh', 'videoid':'D2_r4q2imnQ'},
-      {'name':'FBI', 'videoid':'QQR7t712Mhg'},
+      {'name':'be right back', 'videoId':'J85jV37CsYE'},
+      {'name':'goat scream', 'videoId':'X78GyIfrSV4'},
+      {'name':'bruh', 'videoId':'D2_r4q2imnQ'},
+      {'name':'FBI', 'videoId':'QQR7t712Mhg'},
     ];
 
 
     function add() {
-      player_info.push({
-        'name':document.getElementById('name-input').value,
-        'videoid':document.getElementById('videoId-input').value,
-      });
+      let videoId_in = document.getElementById('videoId-input');
+      let name_in = document.getElementById('name-input');
+      if (videoId_in.value.trim() != "" && name_in.value.trim() != "") {
+        player_info.push({
+          'name':videoId_in.value,
+          'videoId':document.getElementById('videoId-input').value,
+        });
+        name_in.value = "";
+        videoId_input.value = "";
+        build_grid();
+      }
     }
 
     function build_grid() {
       document.getElementById('players').innerHTML = "";
       for (let i = 0; i < player_info.length; i++) {
         const i_ = i;
-        let col = document.createElement('div');
-        document.getElementById('players').appendChild(col);
-        col.classList.add('col-sm-3');
+        // let col = document.createElement('div');
+        // document.getElementById('players').appendChild(col);
+        // col.classList.add('col-sm-3');
         const btn = document.createElement('button');
         btn.disabled = true;
         btn.classList.add('btn', 'btn-lg', 'sound-btn')
         btn.innerHTML = player_info[i].name;
-        col.appendChild(btn);
+        document.getElementById('players').appendChild(btn);
         const player_div = document.createElement('div');
         player_div.setAttribute('id', 'player-' + i);
         btn.appendChild(player_div);
@@ -122,7 +129,7 @@
         player_info[i_].player = new YT.Player('player-'+i_, {
           height: '0',
           width: '0',
-          videoId: player_info[i_].videoid,
+          videoId: player_info[i_].videoId,
           playerVars: {
             autoplay: "0",
             loop: "0",
